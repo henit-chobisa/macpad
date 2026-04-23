@@ -17,9 +17,13 @@ A native macOS menubar agent that turns a **DualShock 4**, **DualSense**, **Xbox
 
 ## Why
 
-Your trackpad died. Your mouse is in the other room. The battery on the wireless one is flat. But there's a PS4 pad sitting right next to the couch.
+I built this for my own setup. I cloud game on my Mac — usually plugged into an external display, controller in hand, couch mode. Which means the trackpad is halfway across the room and the keyboard is flipped behind the screen. That's fine while I'm actually in a game.
 
-That's the moment macpad was built for. And once you start using a thumbstick for cursor work, a shoulder button for space switching, and an on-screen keyboard to type a password without getting up — you stop wanting the trackpad back.
+It stops being fine the moment I need to do anything else. A Slack ping lands. Spotify shuffles to a track I don't want. I tab out of the stream for two seconds and have to navigate back. Every one of those interruptions used to mean pausing, getting up, grabbing the trackpad, doing the one-second thing, putting the trackpad back, rebinding my hands on the controller, finding the game again.
+
+macpad collapses that whole loop into a single button press. **Home button** — cursor wakes up on the thumbstick, A is left click, the on-screen keyboard is a chord away. Do the thing. Press Home again — controller goes back to the game, zero context lost. The whole interruption lasts as long as the interruption actually deserves.
+
+That's the entire pitch. Not a clever toy, not a trackpad replacement. A fast context switch between "I'm gaming" and "I'm on my Mac", without standing up.
 
 ## What it does
 
