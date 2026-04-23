@@ -1,140 +1,221 @@
+<div align="center">
+
 # macpad
 
-Turn your game controller into a first-class macOS input device. Mouse, scroll, keyboard, system shortcuts — all from a DualShock 4, DualSense, Xbox, or Switch Pro controller.
+### Your game controller is now a mouse.
 
-Built for the moment your trackpad gives up and you still have a PS4 pad lying next to the couch.
+A native macOS menubar agent that turns a **DualShock 4**, **DualSense**, **Xbox**, or **Switch Pro** controller into a first-class input device — cursor, scroll, keyboard, and every system shortcut you can dream of.
 
-## Highlights
+[![Swift 5.9](https://img.shields.io/badge/Swift-5.9+-orange.svg?logo=swift)](https://swift.org)
+[![macOS 14+](https://img.shields.io/badge/macOS-14+-blue.svg?logo=apple)](https://www.apple.com/macos)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-- **Precise cursor control** — left stick drives the pointer with a tunable deadzone, response curve, inertia, and on-demand precision / boost holds.
-- **Right-stick scroll** — two-axis pixel scroll with configurable speed and inversion per axis.
-- **Every button remappable** — left / right / middle click, arrow keys, text keys, `⌘Tab`, `⌃Tab`, copy / paste, Mission Control, space switch, Spotlight, Launchpad, media keys, brightness, volume, custom key combos… full list in the config panel.
-- **Hold modifiers** — map any button to Hold ⌃ / ⇧ / ⌥ / ⌘. Works exactly like a physical modifier: press + any other button = that modifier combo.
-- **On-screen keyboard** — 40-key grid driven entirely by the controller. Navigate with D-pad / sticks, type with A, backspace with B, space with X, return with Y, shift-hold with L2. Toggle anywhere with `L1+R1`.
-- **Drag the keyboard** — physical trackpad drag works, and R2 + left stick drags it without leaving the gamepad.
-- **PS / Home button capture** — Apple's DualShock / DualSense driver hides the PS button from the GameController framework. macpad reads the raw HID input report directly (same approach Chromium uses for WebHID) and parses the button bit itself.
-- **Liquid Glass UI** — keyboard and HUD use Tahoe's `glassEffect` when available, with a darker matte fallback for older macOS.
-- **Haptics** — punchy mechanical-click-feel transients on every toggle, mode change, and keyboard keystroke. Enable / disable in config.
-- **HUD** — floating heads-up display shows the last button pressed and its resolved action, so custom mappings never feel opaque.
-- **Menubar agent** — no Dock icon, no window. Lives in the menubar with a pause / resume toggle and a single click into the full config.
+</div>
+
+---
+
+## Why
+
+Your trackpad died. Your mouse is in the other room. The battery on the wireless one is flat. But there's a PS4 pad sitting right next to the couch.
+
+That's the moment macpad was built for. And once you start using a thumbstick for cursor work, a shoulder button for space switching, and an on-screen keyboard to type a password without getting up — you stop wanting the trackpad back.
+
+## What it does
+
+- **Stick-driven cursor** with deadzone, response curve, inertia, and on-demand precision / boost.
+- **Right-stick scroll** in both axes, invertible.
+- **Every button remappable** — clicks, arrows, text, `⌘Tab`, space switch, Mission Control, Spotlight, Launchpad, media keys, brightness, custom combos.
+- **Hold-modifier actions** — map any button to Hold `⌃` / `⇧` / `⌥` / `⌘`. Works exactly like a real modifier: press + another button = combo.
+- **On-screen keyboard** driven entirely by the controller, with haptic feedback on every keystroke.
+- **PS / Home button works** — even though Apple's driver hides it from the GameController framework (macpad reads the raw HID report instead, same trick Chromium uses for WebHID).
+- **Liquid Glass UI** on macOS 26 Tahoe, tasteful matte fallback on older macOS.
+- **Punchy CoreHaptics feedback** on every toggle, mode change, and keypress.
+- **HUD overlay** shows the last button pressed + the action that fired, so a custom mapping is never a guess.
+- **Menubar-only**. No Dock icon, no window management, no friction.
 
 ## Supported controllers
 
-| Controller | Cursor / sticks / D-pad / face / shoulders | Home / PS | Share / Create | Touchpad click |
-|---|---|---|---|---|
-| DualShock 4 (`0x054C:0x09CC`, `0x054C:0x05C4`) | ✅ via GameController | ✅ via raw HID | ✅ via raw HID | ✅ via raw HID |
-| DualSense (`0x054C:0x0CE6`) | ✅ via GameController | ✅ via raw HID | ✅ via raw HID | ✅ via raw HID |
-| Xbox / Switch Pro / MFi | ✅ via GameController | depends on driver | — | — |
+| Controller | Sticks / D-pad / Face / Shoulders | Home / PS | Share / Create | Touchpad click |
+|---|:---:|:---:|:---:|:---:|
+| DualShock 4 <sub>(`054C:09CC`, `054C:05C4`)</sub> | ✅ | ✅ raw HID | ✅ raw HID | ✅ raw HID |
+| DualSense <sub>(`054C:0CE6`)</sub>              | ✅ | ✅ raw HID | ✅ raw HID | ✅ raw HID |
+| Xbox / Switch Pro / MFi                          | ✅ | driver-dependent | — | — |
 
-Other controllers that speak the standard HID GamePad or Joystick usage work for sticks and face buttons but may not expose Home / Share.
+Any controller exposing the standard HID GamePad / Joystick usage will work for sticks and face buttons; PS / Share / Touchpad require the raw-report path we've written for Sony controllers.
 
-## Requirements
-
-- macOS 14 or newer (Liquid Glass rendering kicks in on macOS 26 Tahoe).
-- Swift 5.9+ toolchain (ships with Xcode 15).
-- A supported controller, paired over Bluetooth or USB.
-
-## Install & run
+## Quickstart
 
 ```bash
 git clone https://github.com/henit-chobisa/macpad.git
 cd macpad
-swift build
-.build/debug/macpad
+swift run
 ```
 
-First launch:
+On first launch:
 
-1. macOS will prompt for **Accessibility** permission — required to post synthetic mouse and key events. Grant it in System Settings ▸ Privacy & Security ▸ Accessibility, then relaunch.
-2. macOS will prompt for **Input Monitoring** — required for the raw HID path that catches the PS / Create / Touchpad buttons. Grant it in System Settings ▸ Privacy & Security ▸ Input Monitoring, then relaunch.
+1. **Accessibility** prompt — required to synthesize mouse and keyboard events. Grant in *System Settings ▸ Privacy & Security ▸ Accessibility*, relaunch.
+2. **Input Monitoring** prompt — required for the raw HID path that unlocks PS / Create / Touchpad. Grant in *System Settings ▸ Privacy & Security ▸ Input Monitoring*, relaunch.
+3. Pair the controller over Bluetooth (on DualShock 4: hold `Share + PS` until the light bar flashes rapidly). macpad auto-detects on connect.
 
-Pair the controller via System Settings ▸ Bluetooth (DualShock 4: hold `Share + PS` until the light bar flashes). macpad auto-detects on connect.
-
-> **Tip:** running from Terminal works, but Terminal will swallow any shortcut you map to `⌃←` / `⌃→` / similar because the focused app is Terminal itself. For day-to-day use, launch macpad out of an app bundle or via `open -a` so another app has the focus.
+> 💡 **Terminal gotcha.** If you run macpad from Terminal, shortcuts you map to `⌃←` / `⌃→` / etc. will be eaten by Terminal itself because *it* is the focused app. For daily use, launch macpad through an `.app` bundle or `open -a` so a different app is foreground.
 
 ## Default bindings
 
-| Button | Action |
-|---|---|
-| Left stick | Mouse cursor |
-| Right stick | Scroll (x / y) |
-| A | Left click |
-| B | Right click |
-| X | Space |
-| Y | `⌘Return` |
-| D-pad ↑ / ↓ | Scroll up / down |
-| D-pad ← / → | Arrow left / right |
-| L1 | `⌃⇧Tab` (prev browser tab) |
-| R1 | `⌃Tab` (next browser tab) |
-| L2 (hold) | Boost sensitivity |
-| R2 (hold) | Precision sensitivity |
-| L3 / R3 | Left / right click |
-| Options (−) | Escape |
-| Menu (+) | `⌘Tab` |
-| Home / PS | Toggle macpad on/off |
-| Share / Create | Toggle on-screen keyboard |
-| Touchpad click | Toggle macpad on/off |
-| `L1 + R1` (chord) | Toggle on-screen keyboard |
+| Button              | Action                              |
+|---------------------|-------------------------------------|
+| Left stick          | Move cursor                         |
+| Right stick         | Scroll (x / y)                      |
+| A                   | Left click                          |
+| B                   | Right click                         |
+| X                   | Space                               |
+| Y                   | `⌘Return`                           |
+| D-pad ↑ / ↓         | Scroll up / down                    |
+| D-pad ← / →         | Arrow ← / →                         |
+| L1                  | `⌃⇧Tab` (previous tab)              |
+| R1                  | `⌃Tab` (next tab)                   |
+| L2 (hold)           | Boost sensitivity                   |
+| R2 (hold)           | Precision sensitivity               |
+| L3 / R3             | Left / right click                  |
+| Options `−`         | Escape                              |
+| Menu `+`            | `⌘Tab`                              |
+| **Home / PS**       | **Toggle macpad on / off**          |
+| **Share / Create**  | **Toggle on-screen keyboard**       |
+| **Touchpad click**  | Toggle macpad on / off              |
+| **L1 + R1 chord**   | Toggle on-screen keyboard           |
 
-All of these are editable in the config panel.
+All mappings are editable in the config panel (click the menubar icon ▸ *Settings*).
 
-## Keyboard shortcuts (global)
+### Global keyboard shortcuts
 
-| Shortcut | Action |
-|---|---|
-| `⌃⌥⌘P` | Toggle macpad on / off |
-| `⌃⌥⌘K` | Toggle on-screen keyboard |
+Useful when the controller isn't within reach:
 
-Useful if you temporarily don't have the controller within reach.
+| Shortcut   | Action                       |
+|------------|------------------------------|
+| `⌃⌥⌘P`     | Toggle macpad on / off       |
+| `⌃⌥⌘K`     | Toggle on-screen keyboard    |
 
-## On-screen keyboard
+### On-screen keyboard
 
-| Controller input | Effect |
-|---|---|
-| D-pad | Move selection one cell |
-| L1 / R1 | Jump 5 columns (quick navigation) |
-| A | Type selected key |
-| B | Backspace |
-| X | Space |
-| Y | Return |
-| L2 (hold) | Shift (uppercase) |
-| Menu | Close keyboard |
-| R2 (hold) + left stick | Drag the keyboard panel around the screen |
+| Input                          | Effect                               |
+|--------------------------------|--------------------------------------|
+| D-pad                          | Move selection                       |
+| L1 / R1                        | Jump ±5 columns                      |
+| A                              | Type selected key                    |
+| B                              | Backspace                            |
+| X                              | Space                                |
+| Y                              | Return                               |
+| L2 (hold)                      | Shift (uppercase)                    |
+| Menu                           | Close keyboard                       |
+| **R2 (hold) + left stick**     | **Drag the keyboard panel**          |
 
-The panel is also draggable with a physical mouse / trackpad.
+Trackpad / mouse drag also moves the panel (the hosting view overrides `mouseDownCanMoveWindow`).
 
-## Architecture
+## Development
+
+### Repository layout
 
 ```
-Pad          — central input dispatcher, cursor math, action performer
-HID          — raw IOHIDManager listener, parses DualSense / DualShock 4 input
-               reports for PS / Share / Touchpad bits the GC framework hides
-Keyboard     — SwiftUI on-screen keyboard + NSPanel host with window-drag override
-Haptics      — CoreHaptics patterns layered on GameController's haptics engine
-Config       — @Published struct with button map, face-swap, tuning values
-ConfigView   — full settings UI (button remapper, sticks, haptics, shortcuts)
-Menubar      — NSStatusItem with pause / resume / open-config
-HUD          — floating overlay panel showing the last button / action
+macpad/
+├── Package.swift              # SwiftPM manifest, single executable target
+├── README.md
+├── LICENSE
+└── Sources/macpad/
+    ├── main.swift             # NSApplication bootstrap, global hotkey monitors
+    ├── Pad.swift              # Central input dispatcher — sticks → cursor, buttons → actions
+    ├── HID.swift              # Raw IOHIDManager listener for DualSense / DualShock 4
+    ├── Keyboard.swift         # On-screen keyboard: KeyboardManager + NSPanel host
+    ├── Haptics.swift          # CoreHaptics patterns over GameController's haptics engine
+    ├── HUD.swift              # Floating overlay for last-pressed-button feedback
+    ├── Menubar.swift          # NSStatusItem agent (pause / resume / settings)
+    ├── Config.swift           # @Published config struct, button map, ButtonAction enum
+    ├── ConfigView.swift       # Full SwiftUI settings UI
+    └── Theme.swift            # Shared colors, fonts, spacing tokens
 ```
 
-The raw HID path in `HID.swift` is what makes PS / Create work — macOS's standard `GCController.physicalInputProfile` doesn't expose those buttons. macpad opens the device with `IOHIDDeviceRegisterInputReportCallback`, pulls the full input report, and masks the button bit itself. Bytes for each layout (USB vs Bluetooth, DualShock 4 vs DualSense) are documented inline.
+### Build & run
 
-## Known constraints
+```bash
+# Debug build + run
+swift run
 
-- macOS filters synthetic `CGEvent`s out of Symbolic Hotkey dispatch under some conditions. The current defaults route system-level shortcuts through `keyMod` with an explicit `CGEventFlags`, which works in most foreground apps. If a specific shortcut refuses to fire, move focus off Terminal — terminals interpret `⌃←` / `⌃→` as cursor escape codes and consume them before macOS can see them.
-- PS-button capture requires Input Monitoring permission. Without it, the GameController framework won't surface the button and macpad can't see the raw HID report either.
-- `.app` bundle packaging and Launch-at-Login are not wired up yet. Track that and a few other items in the TODO below.
+# Release build (optimized)
+swift build -c release
+.build/release/macpad
+```
+
+Swift Package Manager resolves everything, no Xcode project needed. If you want one: `swift package generate-xcodeproj` (deprecated) or just `open Package.swift` — Xcode reads the manifest directly.
+
+### Architecture
+
+**Input path.** Controllers surface through two channels, in parallel:
+
+1. **Apple's `GameController` framework** — standard gamepads (sticks, D-pad, face buttons, shoulders). Bound in `Pad.bind(_:)`.
+2. **Raw HID reports** via `IOHIDManager` — the only way to reach PS / Create / Touchpad on Sony controllers, because Apple's driver silently drops those. `HID.swift` registers `IOHIDDeviceRegisterInputReportCallback` per device and decodes the button bits from the raw 64-byte input report. Supports both USB (report `0x01`) and Bluetooth (report `0x11` for DualShock 4, `0x31` for DualSense) layouts; exact byte / bit offsets are commented inline with references to the protocol spec.
+
+Both paths funnel into `Pad.onBtn(_:_:)`. A 50 ms dedup window collapses any doubled events where both sources fire.
+
+**Shoulder chord.** `L1 + R1` toggles the on-screen keyboard. Implementation defers individual L1 / R1 actions by 150 ms; if the opposite shoulder arrives in that window, the chord fires and both press + release are swallowed. A quick tap (< 150 ms press → release) fires the press + release back-to-back as soon as release arrives, so the user never feels the deferral.
+
+**Event synthesis.** `CGEvent` events go to `.cghidEventTap`. Mouse events explicitly set `flags = []` + `mouseEventClickState = 1` — this was a subtle bug fix. Without the flag reset, our modifier-carrying keyboard events (`⌃Tab`, etc.) bled ctrl into the combined session source, and the next left click arrived at apps as `ctrl+click` = right-click on macOS.
+
+**Haptics.** `Haptics` wraps `GCController.haptics`. The `tap()` helper layers a sharp transient + a brief continuous tail (0.04 s) — that one-two structure is what makes a synthesized haptic feel like a real mechanical click rather than a flat buzz. `pulseUp()` / `pulseDown()` chain three events (transient → continuous ramp → transient) for distinct on / off signatures.
+
+**Keyboard panel.** `NSPanel` with `.nonactivatingPanel + .borderless`, no window shadow (so the SwiftUI rounded-rect shadow doesn't fight a native square one behind it). The content view is a `DragHostingView<Content: View>` — a tiny `NSHostingView` subclass that overrides `mouseDownCanMoveWindow` to return `true`, which lets `isMovableByWindowBackground` actually trigger through the SwiftUI hierarchy.
+
+**Liquid Glass.** Keyboard and HUD check `#available(macOS 26.0, *)` and fall back to a matte gradient when not available. `glassEffect(.regular.tint:in:)` is applied inside a `GlassEffectContainer` so the selected-keycap morph can ripple into the panel shape.
+
+### Debugging
+
+Useful toggles:
+
+- `HIDListener.logAllButtons = true` — dumps every HID element event (page / usage / value) — indispensable when a controller's PS button doesn't work because of a non-standard usage code.
+
+If a button isn't reaching macpad:
+
+1. Check the GameController side — `Pad.bind(_:)` logs the full `controller buttons:` list once on connect. If your button name isn't in that list, Apple's driver never exposed it.
+2. Check the HID side — `Pad.swift` has a `print` inside `handle()` (guarded by `logAllButtons`). Toggle it on, press the button, see which HID page+usage it fires on.
+3. If neither fires, macOS is intercepting it (PS-button-opens-Game-Center is the classic case). Turn off the matching shortcut in *System Settings ▸ Game Controllers*.
+
+### Contributing
+
+PRs are welcome. Rough shape of a good contribution:
+
+1. Open an issue first for anything non-trivial — mapping changes, new actions, UI rewrites. We can iterate on design before you write the code.
+2. Match the existing style: SwiftUI for any new UI, no external dependencies if it's avoidable, comments only where the *why* is non-obvious.
+3. Test with at least one Sony and one non-Sony controller where possible.
+4. Keep commit messages focused — one change per commit, imperative mood ("add battery indicator" not "added battery indicator").
+
+Specific good first issues:
+
+- **`.app` bundle** packaging + codesign + notarize pipeline.
+- **Launch at Login** toggle using `SMAppService`.
+- **Menubar battery indicator** — DualSense report `0x01`, byte 52 has the battery %; DualShock 4 report `0x01`, byte 30 low nibble has it.
+- **Live stick visualizer** in the config UI — plot the deadzone and response curve with the live stick position overlay.
+
+## Known limitations
+
+- **Synthetic CGEvents are not always accepted by macOS Symbolic Hotkey dispatch.** For most hotkeys (`⌃←` space switch, `⌃↑` Mission Control, `⌘Space` Spotlight) we post the event and it triggers. For some, macOS filters them out. Workaround: move focus off the terminal (terminals intercept `⌃←` / `⌃→` as escape sequences before the OS sees them).
+- **PS button requires Input Monitoring.** Without it, we can't read the raw HID report; the GameController framework won't surface the button either; there is no workaround.
+- **Packaged `.app` bundle is not in-tree yet.** For now build + run via `swift run` or ship a custom bundle yourself — see roadmap.
 
 ## Roadmap
 
-- `.app` bundle with proper Info.plist + codesign pipeline
-- Launch at Login toggle
-- Menubar battery indicator (DualShock 4 / DualSense report already includes it)
-- Per-app mapping profiles (auto-switch on frontmost app)
-- Live visualizer for stick deadzone + response curve in config
-- Scroll momentum / friction curve
-- Auto-pause when the laptop trackpad is in use
+- [ ] `.app` bundle with proper `Info.plist` + signing
+- [ ] Launch at Login
+- [ ] Menubar battery indicator (DualShock 4 / DualSense)
+- [ ] Per-app mapping profiles (auto-switch on front-app change)
+- [ ] Live visualizer for stick deadzone + response curve
+- [ ] Scroll momentum / friction
+- [ ] Auto-pause when the laptop trackpad is in use
+
+## Credits & references
+
+- [nondebug/dualsense](https://github.com/nondebug/dualsense) — DualSense HID report spec.
+- [psdevwiki — DS4-USB](https://www.psdevwiki.com/ps4/DS4-USB) — DualShock 4 report layouts.
+- [Chrome WebHID](https://developer.chrome.com/docs/capabilities/hid) — the approach of reading raw HID reports when the OS gamepad API hides buttons.
+- Apple [GameController](https://developer.apple.com/documentation/gamecontroller), [CoreHaptics](https://developer.apple.com/documentation/corehaptics), and [IOKit HID](https://developer.apple.com/documentation/iokit) frameworks.
 
 ## License
 
-MIT.
+[MIT](./LICENSE) © 2026 Henit Chobisa.
